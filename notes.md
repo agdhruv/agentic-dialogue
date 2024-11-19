@@ -1,0 +1,2 @@
+- Append "I think the answer is X" to the end --> choose wrong answer so that the conversation moves toward
+- Compare with CoT, CoT-SC, ToT -- can we do better? if not, can we do better with smaller models? or with fewer tokens?
