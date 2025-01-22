@@ -2,7 +2,7 @@ import hashlib
 import json
 
 def format_question_culturalbench_easy(data):
-    question = data['prompt_question']
+    question = f"Question: {data['prompt_question']}"
     options = [
         f"A. {data['prompt_option_a']}",
         f"B. {data['prompt_option_b']}",

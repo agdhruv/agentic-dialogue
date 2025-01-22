@@ -5,15 +5,8 @@ dotenv.load_dotenv()
 
 # Azure OpenAI configuration for Autogen
 config_list = [
-    # {
-    #     "api_type": "azure",
-    #     "model": os.environ['AZURE_DEPLOYMENT_ID'],
-    #     "api_key": os.environ['AZURE_OPENAI_API_KEY'],
-    #     "base_url": os.environ['AZURE_OPENAI_API_URL'],
-    #     "api_version": "2024-02-01"
-    # }
     {
-        "model": "gpt-4-0125-preview",
+        "model": "gpt-3.5-turbo",
         "api_key": os.environ["OPENAI_API_KEY"],
     }
 ]
