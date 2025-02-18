@@ -1,6 +1,5 @@
 import os
 import dotenv
-
 dotenv.load_dotenv()
 
 # Azure OpenAI configuration for Autogen
@@ -24,7 +23,3 @@ SUMMARY_PROMPT_MULTIPLE_CHOICE = (
     "'answer': '<The answer to the question (A, B, C, or D, or no_consensus)>'} "
     "Do not output any other things."
 )
-
-# "Select the option: A, B, C, or D. "
-# "If no consensus was reached, output 'No consensus'. "
-# "Do not output any other things."

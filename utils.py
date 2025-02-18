@@ -1,26 +1,11 @@
-import hashlib
 import json
+import pandas as pd
 
-def format_question_culturalbench_easy(data):
-    question = f"Question: {data['prompt_question']}"
-    options = [
-        f"A. {data['prompt_option_a']}",
-        f"B. {data['prompt_option_b']}",
-        f"C. {data['prompt_option_c']}",
-        f"D. {data['prompt_option_d']}"
-    ]
-    return f"{question}\n" + "\n".join(options)
-
-def format_question_culturalbench_hard(item):
-    return (f"{item['prompt_question']} "
-            f"{item['prompt_option']}\n"
-            f"Is this statement true or false? You must choose either True or False.")
-
-def hash_string(s):
+def format_bbq_question(row: pd.Series) -> str:
     """
-    Generate a SHA-256 hash of the input string.
+    Format a BBQ question for asking the model.
     """
-    return hashlib.sha256(s.encode()).hexdigest()
+    return f"{row['context']} {row['question']} (a) {row['ans0']} (b) {row['ans1']} (c) {row['ans2']}"
 
 def extract_summary(text, question_type):
     """
