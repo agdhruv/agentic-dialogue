@@ -1,4 +1,4 @@
-import json
+from pathlib import Path
 import pandas as pd
 
 def format_bbq_question(row: pd.Series) -> str:
@@ -7,37 +7,23 @@ def format_bbq_question(row: pd.Series) -> str:
     """
     return f"{row['context']} {row['question']} (a) {row['ans0']} (b) {row['ans1']} (c) {row['ans2']}"
 
-def extract_summary(text, question_type):
-    """
-    Extract the disagreement and answer from the summary JSON (which may not be well-formed).
-    """
-    text = text.lower()
-    text = text.replace("'", '"')
-    text = text.replace('\n', '').replace(' ', '')
-    text = text.replace(':true', ':"true"').replace(':false', ':"false"')
-    text = text.replace("'true'", '"true"').replace("'false'", '"false"')
-    text = text.replace('```json', '').replace('```', '')
-    if question_type == "multiple_choice":
-        for option in ['A', 'B', 'C', 'D']:
-            text = text.replace(f":{option}", f':"{option}"')
-    text = text.replace('{disagreement', '{"disagreement"')
-    text = text.replace('answer:', '"answer":')
+def load_bbq_df(categories: list[str]):
+    dfs = []
+    for category in categories:
+        data_path = Path('data/bbq') / f"{category}.jsonl"
 
-    try:
-        # Try parsing as JSON
-        data = json.loads(text)
-        disagreement, answer = data.get('disagreement', None), data.get('answer')
-        if disagreement == 'true':
-            disagreement = True
-        elif disagreement == 'false':
-            disagreement = False
-        
-        if question_type == "true_false":
-            if answer == "true":
-                answer = True
-            elif answer == "false":
-                answer = False
-        return disagreement, answer
-    except json.JSONDecodeError:
-        # Handle plain text case
-        return None, text
+        # Load dataset
+        df = pd.read_json(data_path, lines=True)
+        df = df[df['context_condition'] == "ambig"]
+        df = df.drop(columns=["question_index", "context_condition", "additional_metadata", "answer_info"])
+        dfs.append(df)
+
+    df = pd.concat(dfs, ignore_index=True)
+    # Merge with additional metadata to get the target_loc (the index of the answer option that corresponds to the bias target)
+    df = df.merge(pd.read_csv('data/bbq/additional_metadata.csv', usecols=['category', 'example_id', 'target_loc']), on=['category', 'example_id'])
+    df = df[~df['target_loc'].isnull()] # remove some examples that don't have target_loc
+    df['target_loc'] = df['target_loc'].astype(int)
+    df = df.rename(columns={'target_loc': 'biased_ans_label'})
+    df = df.reset_index(drop=True)
+    
+    return df
